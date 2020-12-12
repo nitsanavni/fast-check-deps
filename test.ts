@@ -76,7 +76,7 @@ test.serial("resolve", (t) => {
 test("explore fast-check", (t) => {
     t.notThrows(() => fc.assert(fc.property(fc.string({ minLength: 1 }), (t0) => t0 !== "")));
 
-    const thrown = t.throws(() => fc.assert(fc.property(fc.string({ minLength: 0 }), (t0) => t0 !== ""))).message;
-
-    t.regex(thrown, /Counterexample.*\"\"/im);
+    t.throws(() => fc.assert(fc.property(fc.string({ minLength: 0 }), (t0) => t0 !== "")), {
+        message: /Counterexample.*\"\"/im,
+    });
 });
