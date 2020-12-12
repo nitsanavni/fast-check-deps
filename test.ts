@@ -52,23 +52,23 @@ test("resolve", (t) => {
         .map(([dependent, requisite]) => ({ dependent, requisite }));
     const dependencies = fc.set(dependency, { compare: isEqual });
 
+    const isResolved = (deps: Dependency[], resolved: Element[]) =>
+        deps.every(
+            ({ dependent, requisite }) =>
+                resolved.some((e) => e === dependent) &&
+                resolved.some((e) => e === requisite) &&
+                resolved.indexOf(dependent) > resolved.indexOf(requisite)
+        );
+
     t.notThrows(() =>
         fc.assert(
             fc.property(dependencies, (deps) => {
                 try {
-                    const resolved = resolve(deps);
-
-                    return deps.every(
-                        ({ dependent, requisite }) =>
-                            resolved.some((e) => e === dependent) &&
-                            resolved.some((e) => e === requisite) &&
-                            resolved.indexOf(dependent) > resolved.indexOf(requisite)
-                    );
+                    return isResolved(deps, resolve(deps));
                 } catch (e) {
                     return /circular/.test(`${e}`);
                 }
-            }),
-            { verbose: true }
+            })
         )
     );
 });
