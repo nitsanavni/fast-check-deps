@@ -9,11 +9,15 @@ test("resolve", (t) => {
     type Dependency = { dependent: Element; requisite: Element };
 
     const resolve = (deps: Dependency[]): Element[] => {
-        const aggregate: { [key in Element]?: { dependent: Element; allRequisites: Element[] } } = {};
+        const aggregate: {
+            [key in Element]?: { dependent: Element; allRequisites: Element[] };
+        } = {};
 
         deps.forEach(({ dependent, requisite }) => {
             const empty = (e: Element) => ({ dependent: e, allRequisites: [] });
-            (aggregate[dependent] ??= empty(dependent)).allRequisites.push(requisite);
+            (aggregate[dependent] ??= empty(dependent)).allRequisites.push(
+                requisite
+            );
             aggregate[requisite] ??= empty(requisite);
         });
 
@@ -45,7 +49,9 @@ test("resolve", (t) => {
     };
 
     const elements = "abcdefghij".split("") as Element[];
-    const element = fc.nat({ max: elements.length - 1 }).map((i) => elements[i]);
+    const element = fc
+        .nat({ max: elements.length - 1 })
+        .map((i) => elements[i]);
     const dependency = fc
         .tuple(element, element)
         .filter(([e1, e2]) => e1 !== e2)
@@ -74,9 +80,17 @@ test("resolve", (t) => {
 });
 
 test("explore fast-check", (t) => {
-    t.notThrows(() => fc.assert(fc.property(fc.string({ minLength: 1 }), (t0) => t0 !== "")));
+    t.notThrows(() =>
+        fc.assert(fc.property(fc.string({ minLength: 1 }), (t0) => t0 !== ""))
+    );
 
-    t.throws(() => fc.assert(fc.property(fc.string({ minLength: 0 }), (t0) => t0 !== "")), {
-        message: /Counterexample.*\"\"/im,
-    });
+    t.throws(
+        () =>
+            fc.assert(
+                fc.property(fc.string({ minLength: 0 }), (t0) => t0 !== "")
+            ),
+        {
+            message: /Counterexample.*\"\"/im,
+        }
+    );
 });
