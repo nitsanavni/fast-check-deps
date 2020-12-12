@@ -2,7 +2,7 @@ import test from "ava";
 import * as fc from "fast-check";
 import { chain, each, isEmpty, isEqual, pullAll } from "lodash";
 
-test.serial("resolve", (t) => {
+test("resolve", (t) => {
     type Element = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j";
     // https://english.stackexchange.com/questions/25575/what-is-the-correct-word-for-dependee
     // the dependent depends on / requires the requisite
