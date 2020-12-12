@@ -1,0 +1,19 @@
+{
+    "extensions": [
+        ".ts"
+    ],
+    "include": [
+        "**"
+    ],
+    "exclude": [
+        "**/node_modules/**"
+    ],
+    "reporter": [
+        "text",
+        "text-summary",
+        "html"
+    ],
+    "require": [
+        "source-map-support/register"
+    ]
+}

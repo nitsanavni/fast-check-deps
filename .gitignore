@@ -3,3 +3,5 @@ node_modules/
 **/*.js.map
 .vscode/
 .history/
+coverage/
+.nyc_output/

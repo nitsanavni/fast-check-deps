@@ -26,8 +26,8 @@ test.serial("resolve", (t) => {
 
         while (ret.length < expectedLength) {
             const ready = chain(aggregate)
-                .filter((b) => isEmpty(b?.allRequisites))
-                .map((b) => b?.dependent)
+                .filter((b) => isEmpty(b!.allRequisites))
+                .map((b) => b!.dependent)
                 .compact()
                 .value();
 
