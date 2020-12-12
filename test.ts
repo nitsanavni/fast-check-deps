@@ -65,12 +65,8 @@ test.serial("resolve", (t) => {
                             resolved.indexOf(dependent) > resolved.indexOf(requisite)
                     );
                 } catch (e) {
-                    if (/circular/.test(`${e}`)) {
-                        return true;
-                    }
+                    return /circular/.test(`${e}`);
                 }
-
-                return false;
             }),
             { verbose: true }
         )
