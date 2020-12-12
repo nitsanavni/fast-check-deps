@@ -2,23 +2,19 @@ import test from "ava";
 import * as fc from "fast-check";
 import { chain, each, isEmpty, isEqual, pullAll } from "lodash";
 
-// [["a","b"]] -> ["b","a"]
-
 test.serial("resolve", (t) => {
-    t.timeout(30000);
-
     type Element = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j";
     // https://english.stackexchange.com/questions/25575/what-is-the-correct-word-for-dependee
     // the dependent depends on / requires the requisite
     type Dependency = { dependent: Element; requisite: Element };
 
     const resolve = (deps: Dependency[]): Element[] => {
-        const requisites: { [key in Element]?: { dependent: Element; requisites: Element[] } } = {};
+        const aggregate: { [key in Element]?: { dependent: Element; allRequisites: Element[] } } = {};
 
         deps.forEach(({ dependent, requisite }) => {
-            const empty = (e: Element) => ({ dependent: e, requisites: [] });
-            (requisites[dependent] ??= empty(dependent)).requisites.push(requisite);
-            requisites[requisite] ??= empty(requisite);
+            const empty = (e: Element) => ({ dependent: e, allRequisites: [] });
+            (aggregate[dependent] ??= empty(dependent)).allRequisites.push(requisite);
+            aggregate[requisite] ??= empty(requisite);
         });
 
         const ret: Element[] = [];
@@ -28,10 +24,9 @@ test.serial("resolve", (t) => {
             .uniq()
             .value().length;
 
-        console.log(requisites);
         while (ret.length < expectedLength) {
-            const ready = chain(requisites)
-                .filter((b) => isEmpty(b?.requisites))
+            const ready = chain(aggregate)
+                .filter((b) => isEmpty(b?.allRequisites))
                 .map((b) => b?.dependent)
                 .compact()
                 .value();
@@ -42,8 +37,8 @@ test.serial("resolve", (t) => {
 
             ret.push(...ready);
 
-            each(ready, (r) => delete requisites[r]);
-            each(requisites, (b) => pullAll(b!.requisites, ready));
+            each(ready, (r) => delete aggregate[r]);
+            each(aggregate, (b) => pullAll(b!.allRequisites, ready));
         }
 
         return ret;
@@ -63,26 +58,12 @@ test.serial("resolve", (t) => {
                 try {
                     const resolved = resolve(deps);
 
-                    console.log(deps, resolved);
-
-                    if (
-                        !deps.every(
-                            ({ dependent, requisite }) =>
-                                resolved.some((e) => e === dependent) && resolved.some((e) => e === requisite)
-                        )
-                    ) {
-                        return false;
-                    }
-
-                    if (
-                        !deps.every(
-                            ({ dependent, requisite }) => resolved.indexOf(dependent) > resolved.indexOf(requisite)
-                        )
-                    ) {
-                        return false;
-                    }
-
-                    return true;
+                    return deps.every(
+                        ({ dependent, requisite }) =>
+                            resolved.some((e) => e === dependent) &&
+                            resolved.some((e) => e === requisite) &&
+                            resolved.indexOf(dependent) > resolved.indexOf(requisite)
+                    );
                 } catch (e) {
                     if (/circular/.test(`${e}`)) {
                         return true;
