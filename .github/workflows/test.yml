@@ -13,7 +13,7 @@ jobs:
             - name: build
               run: npx tsc
             - name: test
-              run: npx nyc ava
+              run: npx c8 ava
             - name: archive code coverage results
               uses: actions/upload-artifact@v2
               with:
